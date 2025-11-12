@@ -1,7 +1,7 @@
 #!/bin/bash
 # Complete VPC Cleanup Script
 
-echo "🧹 Starting complete VPC cleanup..."
+echo " Starting complete VPC cleanup..."
 
 # Kill all Python HTTP servers
 echo "Stopping web servers..."
@@ -57,7 +57,7 @@ sudo rm -rf /var/run/vpcctl/* 2>/dev/null || true
 
 # Verify cleanup
 echo ""
-echo "✅ Cleanup complete!"
+echo " Cleanup complete!"
 echo ""
 echo "Verification:"
 namespaces_count=$(sudo ip netns list 2>/dev/null | grep -c vpc || echo 0)
@@ -86,9 +86,9 @@ if [ "$namespaces_count" -eq 0 ] && \
    [ "$bridges_count" -eq 0 ] && \
    [ "$veth_count" -eq 0 ] && \
    [ "$peer_count" -eq 0 ]; then
-    echo "✨ System is clean!"
+    echo " System is clean!"
 else
-    echo "⚠️  Some resources may still exist. Check manually:"
+    echo "  Some resources may still exist. Check manually:"
     echo "  sudo ip netns list"
     echo "  ip link show"
 fi
