@@ -52,9 +52,9 @@ show_timestamp "[00:00]" "Cleanup & Preparation"
 
 echo "Step 1: Cleaning up any existing resources..."
 sudo pkill -f "python3 -m http.server" 2>/dev/null || true
-sudo ~/vpc-project/cleanup-all.sh 2>&1 | grep -E "✅|Cleanup"
+sudo ~/vpc-project/cleanup-all.sh 2>&1 | grep -E "|Cleanup"
 echo ""
-echo "✅ Environment is clean and ready"
+echo " Environment is clean and ready"
 
 pause_for_recording "Cleanup complete. Ready to show CLI help?"
 
@@ -137,13 +137,13 @@ echo ""
 echo "Starting web server in PUBLIC subnet..."
 sudo ip netns exec vpc1-public python3 -m http.server 8080 >/dev/null 2>&1 &
 PID1=$!
-echo "✅ Server running on 10.0.1.10:8080 (PID: $PID1)"
+echo " Server running on 10.0.1.10:8080 (PID: $PID1)"
 echo ""
 
 echo "Starting web server in PRIVATE subnet..."
 sudo ip netns exec vpc1-private python3 -m http.server 8080 >/dev/null 2>&1 &
 PID2=$!
-echo "✅ Server running on 10.0.2.10:8080 (PID: $PID2)"
+echo " Server running on 10.0.2.10:8080 (PID: $PID2)"
 echo ""
 sleep 2
 
@@ -159,12 +159,12 @@ echo ""
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 1: Host → Public Subnet"
-echo "Expected: ✅ SUCCESS"
+echo "Expected:  SUCCESS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if curl -s --max-time 3 http://10.0.1.10:8080 | head -3; then
-    echo "✅ PASSED"
+    echo " PASSED"
 else
-    echo "❌ FAILED"
+    echo " FAILED"
 fi
 
 pause_for_recording "Test 1 complete. Continue?"
@@ -172,12 +172,12 @@ pause_for_recording "Test 1 complete. Continue?"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 2: Public → Private (Intra-VPC)"
-echo "Expected: ✅ SUCCESS"
+echo "Expected:  SUCCESS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if sudo ip netns exec vpc1-public curl -s --max-time 3 http://10.0.2.10:8080 | head -3; then
-    echo "✅ PASSED"
+    echo " PASSED"
 else
-    echo "❌ FAILED"
+    echo " FAILED"
 fi
 
 pause_for_recording "Test 2 complete. Continue?"
@@ -185,19 +185,19 @@ pause_for_recording "Test 2 complete. Continue?"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 3: Public Subnet → Internet"
-echo "Expected: ✅ SUCCESS (NAT enabled)"
+echo "Expected:  SUCCESS (NAT enabled)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 sudo ip netns exec vpc1-public ping -c 3 8.8.8.8
-echo "✅ PASSED"
+echo " PASSED"
 
 pause_for_recording "Test 3 complete. Continue?"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 4: Private Subnet → Internet"
-echo "Expected: ❌ BLOCKED (no NAT)"
+echo "Expected:  BLOCKED (no NAT)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-timeout 5 sudo ip netns exec vpc1-private ping -c 3 8.8.8.8 || echo "✅ PASSED - Correctly blocked!"
+timeout 5 sudo ip netns exec vpc1-private ping -c 3 8.8.8.8 || echo " PASSED - Correctly blocked!"
 
 pause_for_recording "NAT tests complete. Ready for VPC isolation?"
 
@@ -214,14 +214,14 @@ echo "════════════════════════�
 echo ""
 
 echo "Creating second VPC (VPC2)..."
-sudo vpcctl create-vpc --name vpc2 --cidr 172.16.0.0/16 --internet-interface eth0 2>&1 | grep "✅"
-sudo vpcctl add-subnet --vpc vpc2 --name public --cidr 172.16.1.0/24 --type public 2>&1 | grep "✅"
+sudo vpcctl create-vpc --name vpc2 --cidr 172.16.0.0/16 --internet-interface eth0 2>&1 | grep ""
+sudo vpcctl add-subnet --vpc vpc2 --name public --cidr 172.16.1.0/24 --type public 2>&1 | grep ""
 echo ""
 
 echo "Starting web server in VPC2..."
 sudo ip netns exec vpc2-public python3 -m http.server 8080 >/dev/null 2>&1 &
 PID3=$!
-echo "✅ Server running on 172.16.1.10:8080 (PID: $PID3)"
+echo " Server running on 172.16.1.10:8080 (PID: $PID3)"
 sleep 2
 
 pause_for_recording "VPC2 created. Ready to test isolation?"
@@ -230,14 +230,14 @@ echo ""
 echo "Adding isolation rules between VPCs..."
 sudo iptables -I FORWARD 1 -s 10.0.0.0/16 -d 172.16.0.0/16 -j DROP
 sudo iptables -I FORWARD 1 -s 172.16.0.0/16 -d 10.0.0.0/16 -j DROP
-echo "✅ Isolation rules applied"
+echo " Isolation rules applied"
 echo ""
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 5: VPC1 → VPC2 (Isolation Test)"
-echo "Expected: ❌ BLOCKED"
+echo "Expected:  BLOCKED"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-timeout 5 sudo ip netns exec vpc1-public ping -c 2 172.16.1.10 || echo "✅ PASSED - VPCs are isolated!"
+timeout 5 sudo ip netns exec vpc1-public ping -c 2 172.16.1.10 || echo " PASSED - VPCs are isolated!"
 
 pause_for_recording "Isolation test complete. Ready for peering?"
 
@@ -257,10 +257,10 @@ pause_for_recording "Peering established. Ready to test?"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 6: VPC1 → VPC2 (After Peering)"
-echo "Expected: ✅ SUCCESS"
+echo "Expected:  SUCCESS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 sudo ip netns exec vpc1-public ping -c 3 172.16.1.10
-echo "✅ PASSED - Peering works!"
+echo " PASSED - Peering works!"
 
 pause_for_recording "Peering test complete. Ready for firewall rules?"
 
@@ -301,12 +301,12 @@ pause_for_recording "Firewall applied. Ready to test?"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 7: Port 8080 (Allowed)"
-echo "Expected: ✅ SUCCESS"
+echo "Expected:  SUCCESS"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if sudo ip netns exec vpc1-private curl -s --max-time 3 http://10.0.1.10:8080 | head -2; then
-    echo "✅ PASSED"
+    echo " PASSED"
 else
-    echo "❌ FAILED"
+    echo " FAILED"
 fi
 
 pause_for_recording "Test 7 complete. Continue?"
@@ -314,9 +314,9 @@ pause_for_recording "Test 7 complete. Continue?"
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "TEST 8: Port 22 (Blocked)"
-echo "Expected: ❌ BLOCKED"
+echo "Expected:  BLOCKED"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-timeout 3 sudo ip netns exec vpc1-private nc -zv 10.0.1.10 22 2>&1 || echo "✅ PASSED - Port 22 blocked!"
+timeout 3 sudo ip netns exec vpc1-private nc -zv 10.0.1.10 22 2>&1 || echo " PASSED - Port 22 blocked!"
 
 pause_for_recording "Firewall tests complete. Ready for cleanup?"
 
@@ -334,7 +334,7 @@ echo ""
 
 echo "Stopping web servers..."
 sudo kill $PID1 $PID2 $PID3 2>/dev/null
-echo "✅ All servers stopped"
+echo " All servers stopped"
 echo ""
 
 pause_for_recording "Servers stopped. Ready to delete VPCs?"
@@ -355,10 +355,10 @@ echo "VPCs:"
 sudo vpcctl list-vpcs
 echo ""
 echo "Namespaces:"
-sudo ip netns list | grep vpc || echo "✅ No VPC namespaces found"
+sudo ip netns list | grep vpc || echo " No VPC namespaces found"
 echo ""
 echo "Bridges:"
-ip link show type bridge | grep vpc || echo "✅ No VPC bridges found"
+ip link show type bridge | grep vpc || echo " No VPC bridges found"
 
 pause_for_recording "Cleanup verified. Ready for summary?"
 
@@ -375,11 +375,11 @@ echo "║              DEMONSTRATION COMPLETE                    ║"
 echo "║                                                        ║"
 echo "╚════════════════════════════════════════════════════════╝"
 echo ""
-echo "✅ Tests Completed:"
+echo " Tests Completed:"
 echo ""
 echo "  ✓ VPC Creation & Management"
 echo "  ✓ Public & Private Subnets"
-echo "  ✓ NAT Gateway (Public: ✅ | Private: ❌)"
+echo "  ✓ NAT Gateway (Public:  | Private: )"
 echo "  ✓ VPC Isolation (Blocked by default)"
 echo "  ✓ VPC Peering (Controlled access)"
 echo "  ✓ Firewall Rules (Port-level control)"
@@ -389,9 +389,9 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Resources:"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  📁 GitHub: [Your Repo URL]"
-echo "  📝 Blog: [Your Blog URL]"
-echo "  📊 Logs: /var/log/vpcctl.log"
+echo "   GitHub: [Your Repo URL]"
+echo "   Blog: [Your Blog URL]"
+echo "   Logs: /var/log/vpcctl.log"
 echo ""
 echo "╔════════════════════════════════════════════════════════╗"
 echo "║                   THANK YOU!                           ║"
