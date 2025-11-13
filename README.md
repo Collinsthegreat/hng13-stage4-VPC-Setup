@@ -100,10 +100,10 @@ cdcd
 vpc-linux
 2. Install vpcctl
 bash
-# executable# Make the CLI executable
+ executable# Make the CLI executable
 chmodchmod
 +x bin/vpcctl
-# symlink# Create system-wide symlink
+ symlink# Create system-wide symlink
 sudosudo
 lnln
 -sf
@@ -111,45 +111,45 @@ $($(
 pwdpwd
 ))
 /vpcctl/bin/vpcctl /usr/local/bin/vpcctl
-# installation# Verify installation
+ installation# Verify installation
 vpcctl helpvpcctl --help
 3. Find Your Internet Interface
 bash
-# interface# Find your default network interface
+ interface Find your default network interface
 ipip
 route
 ||
 grepgrep
 default
-# eth0# Output example: default via 192.168.1.1 dev eth0
-# enp0s3)# Your interface is after "dev" (e.g., eth0, wlan0, enp0s3)
+ eth0# Output example: default via 192.168.1.1 dev eth0
+ enp0s3)# Your interface is after "dev" (e.g., eth0, wlan0, enp0s3)
  Quick Start
 Create Your First VPC
 bash
-# 16# Create VPC with CIDR 10.0.0.0/16
+ 16 Create VPC with CIDR 10.0.0.0/16
 sudosudo
 vpcctl create-vpc --name myvpc --cidr
 10.010.0
 .0.0/eth0.0.0/16 --internet-interface eth0
-# access)# Add public subnet (with internet access)
+ access) Add public subnet (with internet access)
 sudosudo
 vpcctl add-subnet --vpc myvpc --name public --cidr
 10.010.0
 .1.0/public.1.0/24 --type public
-# access)# Add private subnet (no internet access)
+ access) Add private subnet (no internet access)
 sudosudo
 vpcctl add-subnet --vpc myvpc --name private --cidr
 10.010.0
 .2.0/private.2.0/24 --type private
-# VPCs# List all VPCs
+ VPCs# List all VPCs
 sudosudo
 vpcctl list-vpcs
-# details# Inspect VPC details
+ details Inspect VPC details
 sudosudo
 vpcctl inspect-vpc --name myvpc
 Deploy an Application
 bash
-# subnet# Deploy web server in public subnet
+ subnet Deploy web server in public subnet
 sudosudo
 ipip
 netns
@@ -157,10 +157,10 @@ execexec
 myvpc-public python3 -m http.server
 80808080
 &&
-# host# Test from host
+ host Test from host
 curlcurl
 http://10.0.1.10:8080
-# subnet# Test internet access from public subnet
+ subnet Test internet access from public subnet
 sudosudo
 ipip
 netns
@@ -173,37 +173,37 @@ pingping
 .8.8.8.8
 Clean Up
 bash
-# resources# Delete VPC and all resources
+ resources# Delete VPC and all resources
 sudosudo
 vpcctl delete-vpc --name myvpc
-# cleanup# Or use comprehensive cleanup
+ cleanup Or use comprehensive cleanup
 sudosudo
 ./cleanup-all.sh
-📖 Usage
+ Usage
 Available Commands
 bash
 vpcctl --help
-# commands# Show all commands
-# Management# VPC Management
+ commands Show all commands
+ Management VPC Management
 vpcctl create-vpc
-# VPC# Create a new VPC
+ VPC Create a new VPC
 vpcctl delete-vpc
-# VPC# Delete a VPC
+ VPC Delete a VPC
 vpcctl list-vpcs
-# VPCs# List all VPCs
+ VPCs List all VPCs
 vpcctl inspect-vpc
-# details# Inspect VPC details
+ details Inspect VPC details
 vpcctl verify-vpc
-# resources# Verify VPC resources
-# Management# Subnet Management
+ resources Verify VPC resources
+ Management# Subnet Management
 vpcctl add-subnet
-# VPC# Add subnet to VPC
-# Security# Security
+ VPC Add subnet to VPC
+ Security Security
 vpcctl apply-firewall
-# policy# Apply firewall policy
-# Peering# Peering
+ policy Apply firewall policy
+ Peering Peering
 vpcctl peer-vpc
-# peering# Create VPC peering
+ peering Create VPC peering
 Command Reference
 Create VPC
 bash
@@ -255,7 +255,7 @@ Enable NAT
 (public only) - Configure iptables MASQUERADE
 NAT Gateway
 bash
-# forwarding# Enable IP forwarding
+ forwarding Enable IP forwarding
 echoecho
 11
 >>
@@ -263,7 +263,7 @@ echoecho
 
 VPC Isolation
 bash
-# traffic# Block inter-VPC traffic
+ traffic Block inter-VPC traffic
 iptables -I FORWARD
 11
 -s
